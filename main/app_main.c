@@ -10,42 +10,28 @@
 #include "driver/i2c_master.h"
 #include "driver/i2c_types.h"
 #include "esp_err.h"
+#include "i2c_utils.h"  /* Include the new I2C utilities header */
 
 static const char* TAG = "aht20 test";
 
 #define I2C_MASTER_FREQ_HZ  100000          /*!< I2C master clock frequency */
-
-
-/**
- * @brief Initialize I2C master bus
- * @param sda_io_num GPIO number for I2C SDA signal
- * @param scl_io_num GPIO number for I2C SCL signal 
- * @param bus_num I2C port number
- * @param[out] i2c_handle Pointer to store the I2C bus handle
- * @return
- *     - ESP_OK Success
- *     - ESP_ERR_INVALID_ARG Parameter error
- *     - ESP_FAIL Driver install error
- */
-esp_err_t i2c_master_init(int sda_io_num, int scl_io_num, int bus_num, i2c_master_bus_handle_t* i2c_handle)
-{
-    i2c_master_bus_config_t i2c_bus_config = {
-        .clk_source = I2C_CLK_SRC_DEFAULT,
-        .i2c_port = bus_num,
-        .scl_io_num = scl_io_num,
-        .sda_io_num = sda_io_num,
-        .glitch_ignore_cnt = 7,
-        .flags.enable_internal_pullup = true,
-    };
-
-    return i2c_new_master_bus(&i2c_bus_config, i2c_handle);
-}
 
 static i2c_master_bus_handle_t i2c_bus_0_handle = NULL;
 static i2c_master_bus_handle_t i2c_bus_1_handle = NULL;
 static aht20_dev_handle_t aht20_0_handle = NULL;
 static aht20_dev_handle_t aht20_1_handle = NULL;
 
+/**
+ * @brief Main application entry point
+ *
+ * This function initializes two I2C master buses and configures two AHT20 sensors
+ * connected to these buses. It probes the sensors, reads temperature and humidity
+ * data from them in a continuous loop, and logs this data. A toggle variable is
+ * also periodically switched within the loop for demonstration purposes.
+ *
+ * The function demonstrates setting up I2C communication, configuring sensor-specific
+ * settings, and reading environmental data from multiple sensors.
+ */
 void app_main(void)
 {
     ESP_ERROR_CHECK(i2c_master_init(CONFIG_I2C_MASTER_0_SDA, CONFIG_I2C_MASTER_0_SCL, 0, &i2c_bus_0_handle));
