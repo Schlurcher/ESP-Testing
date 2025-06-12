@@ -2,19 +2,16 @@
 
 #include "aht20.h"
 #include "esp_lcd_panel_dev.h"
-#include "esp_lcd_types.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
-#include "driver/gpio.h"
 #include "driver/i2c_master.h"
 #include "driver/i2c_types.h"
 #include "esp_err.h"
-#include "i2c_utils.h"  /* Include the new I2C utilities header */
+#include "i2c_utils.h"
+#include "sdkconfig.h"
 
 static const char* TAG = "aht20 test";
-
-#define I2C_MASTER_FREQ_HZ  100000          /*!< I2C master clock frequency */
 
 static i2c_master_bus_handle_t i2c_bus_0_handle = NULL;
 static i2c_master_bus_handle_t i2c_bus_1_handle = NULL;
@@ -23,23 +20,15 @@ static aht20_dev_handle_t aht20_1_handle = NULL;
 
 /**
  * @brief Main application entry point
- *
- * This function initializes two I2C master buses and configures two AHT20 sensors
- * connected to these buses. It probes the sensors, reads temperature and humidity
- * data from them in a continuous loop, and logs this data. A toggle variable is
- * also periodically switched within the loop for demonstration purposes.
- *
- * The function demonstrates setting up I2C communication, configuring sensor-specific
- * settings, and reading environmental data from multiple sensors.
  */
 void app_main(void)
 {
     ESP_ERROR_CHECK(i2c_master_init(CONFIG_I2C_MASTER_0_SDA, CONFIG_I2C_MASTER_0_SCL, 0, &i2c_bus_0_handle));
     ESP_ERROR_CHECK(i2c_master_init(CONFIG_I2C_MASTER_1_SDA, CONFIG_I2C_MASTER_1_SCL, 1, &i2c_bus_1_handle));
 
-    i2c_aht20_config_t aht20_i2c_config = {
+    const i2c_aht20_config_t aht20_i2c_config = {
         .i2c_config.device_address = AHT20_ADDRESS_0,
-        .i2c_config.scl_speed_hz = I2C_MASTER_FREQ_HZ,
+        .i2c_config.scl_speed_hz = CONFIG_I2C_MASTER_FREQ_HZ,
         .i2c_timeout = 100,
     };
 

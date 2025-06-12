@@ -1,5 +1,23 @@
 menu "Configuration"
 
+    choice I2C_MASTER_FREQ
+        prompt "I2C Master Clock Frequency"
+        default I2C_MASTER_FREQ_100K
+        help
+            Select the I2C master clock frequency.
+
+        config I2C_MASTER_FREQ_100K
+            bool "100 KHz (Standard Mode)"
+
+        config I2C_MASTER_FREQ_400K
+            bool "400 KHz (Fast Mode)"
+        endchoice
+
+    config I2C_MASTER_FREQ_HZ
+        int
+        default 100000 if I2C_MASTER_FREQ_100K
+        default 400000 if I2C_MASTER_FREQ_400K
+
     menu "I2C Master 0"
     endmenu
 
